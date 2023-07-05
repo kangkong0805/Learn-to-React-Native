@@ -8,6 +8,7 @@ import {
   View,
 } from "react-native";
 import { ScrollView } from "react-native-web";
+import { Fontisto } from "@expo/vector-icons";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
@@ -18,6 +19,17 @@ export default function App() {
   const [ok, setOk] = useState(true);
 
   const API_KEY = "7163a59b0f4ce36adb14bf042e162569";
+
+  // 날씨 아이콘
+  const icons = {
+    Clouds: "cloudy", // 흐림
+    Clear: "day-sunny", // 맑음
+    Atmophere: "cloudy-gusts", // 돌풍
+    Snow: "snow", // 눈
+    Drizzle: "rain", // 이슬비, 가랑비
+    Rain: "rains", // 비
+    ThunderStorm: "lightning", // 번개
+  };
 
   const ask = async () => {
     // const { granted } = await Location.requestForegroundPermissionsAsync();
@@ -38,11 +50,12 @@ export default function App() {
     // Location.setGoogleApiKey();
 
     // setCity(location[0].city);
+
+    // 날씨 데이터 조회
     const res = await fetch(
       `https://api.openweathermap.org/data/2.5/forecast?lat=${latitude}&lon=${longitude}&exclude=alerts&appid=${API_KEY}&units=metric`
     );
     const json = await res.json();
-    console.log(json.list);
     setDays(json.list);
   };
 
@@ -62,24 +75,33 @@ export default function App() {
         showsVerticalScrollIndicator={false} // 스크롤 바 안 보이게
       >
         {days.length === 0 ? (
-          <View style={styles.day}>
+          <View style={{ ...styles.day, alignItems: "center" }}>
             <ActivityIndicator color="white" size="large" />
           </View>
         ) : (
-          days.map((day, index) => {
-            console.log(day);
-            return (
-              <View key={index} style={styles.day}>
+          days.map((day, index) => (
+            <View key={index} style={styles.day}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  width: "100%",
+                  justifyContent: "space-between",
+                }}
+              >
                 <Text style={styles.temp}>
                   {parseFloat(day.main.temp).toFixed(1)}
                 </Text>
-                <Text style={styles.description}>{day.weather[0].main}</Text>
-                <Text style={styles.tinyText}>
-                  {day.weather[0].description}
-                </Text>
+                <Fontisto
+                  name={icons[day.weather[0].main]}
+                  size={68}
+                  color="white"
+                />
               </View>
-            );
-          })
+              <Text style={styles.description}>{day.weather[0].main}</Text>
+              <Text style={styles.tinyText}>{day.weather[0].description}</Text>
+            </View>
+          ))
         )}
       </ScrollView>
     </View>
@@ -99,22 +121,27 @@ const styles = StyleSheet.create({
   cityContent: {
     fontSize: 58,
     fontWeight: 500,
+    color: "white",
   },
+
   day: {
-    // flex: 1,
-    alignItems: "center",
     width: SCREEN_WIDTH,
+    paddingHorizontal: 20,
   },
   temp: {
     marginTop: 50,
     fontWeight: 600,
-    fontSize: 178,
+    fontSize: 100,
+    color: "white",
   },
   description: {
-    fontSize: 55,
-    marginTop: -30,
+    fontSize: 30,
+    marginTop: -10,
+    color: "white",
   },
   tinyText: {
-    fontSize: 20,
+    marginTop: -10,
+    fontSize: 25,
+    color: "white",
   },
 });
